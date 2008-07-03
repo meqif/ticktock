@@ -1,13 +1,11 @@
-/* See LICENSE file for copyright and license details. */
-/*
+/* See LICENSE file for copyright and license details.
+ *
  * ticktock -- a small, secure and light time daemon
  * Uses the Time protocol (port 37), instead of NTP
  *
  * TODO:
  *   Add DNS resolution
  *   Add loop for checking and setting the clock
- *   Read the server from argv
- *   Getopt
  */
 
 /* Socket stuff */
@@ -52,7 +50,6 @@ int ticktock(const char *hostname, time_t *time_new) {
     nbytes = recv(sockfd, buf, sizeof buf, 0);
     buf[nbytes] = 0;
     *time_new = (time_t)(ntohl(*(uint32_t *)buf) - BASE_1970);
-    printf("Received: %ld\n", *time_new);
 
     close(sockfd);
     return 0;
@@ -62,13 +59,8 @@ int main() {
     struct timeval tv;
     time_t time_new;
 
-    if (gettimeofday(&tv, NULL) == -1)
-        printf("Could not get system time.: %s\n", strerror(errno));
-
     ticktock(NTP_SERVER, &time_new);
-
-    printf("The clock differs by %ld seconds.\n", tv.tv_sec - time_new);
-
+    printf("Received: %ld\n", time_new);
     tv.tv_sec  = time_new;
     tv.tv_usec = 0;
 
