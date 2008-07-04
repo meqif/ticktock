@@ -3,8 +3,6 @@
  * ticktock -- a small, secure and light time daemon
  * Uses the Time protocol (port 37), instead of NTP
  *
- * TODO:
- *   Add loop for checking and setting the clock
  */
 
 #include "ticktock.h"
@@ -75,7 +73,7 @@ int main(int argc, char **argv) {
         perror("Could not get system time");
         exit(EXIT_FAILURE);
     }
-    delta = tv.tv_sec - time_new;
+    delta = (int)(tv.tv_sec - time_new);
 
     tv.tv_sec  = time_new;
     tv.tv_usec = 0;
