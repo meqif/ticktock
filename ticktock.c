@@ -20,15 +20,15 @@ int ticktock(const char *hostname, time_t *time_new) {
 
     /* Hints about the type of socket */
     memset(&hints, '\0', sizeof hints);
-    hints.ai_family = AF_UNSPEC;
+    hints.ai_family   = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
 
     /* Translate address and service information */
     err = getaddrinfo(hostname, SERVICE, &hints, &res);
     if (err || res == NULL) {
-		printf("Failed to lookup %s\n", hostname);
-		exit(1);
-	}
+        printf("Failed to lookup %s\n", hostname);
+        exit(1);
+    }
 
     /* Create socket */
     sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
