@@ -7,17 +7,7 @@
  *   Add loop for checking and setting the clock
  */
 
-/* Network stuff */
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
-
-#include <sys/time.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-#include <errno.h>
+#include "ticktock.h"
 
 #define TIME_SERVER "158.152.1.76"
 #define SERVICE "time"
@@ -48,7 +38,8 @@ int ticktock(const char *hostname, time_t *time_new) {
     }
 
     /* Initiate connection */
-    if (connect(sockfd, res->ai_addr, res->ai_addrlen) == -1) {
+    err = connect(sockfd, res->ai_addr, res->ai_addrlen);
+    if (err == -1) {
         perror("connect");
         exit(1);
     }
