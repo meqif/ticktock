@@ -63,12 +63,20 @@ int main(int argc, char **argv) {
     struct timeval tv;
     time_t time_new;
     char *hostname = NULL;
+    int delta;
 
     if (argc == 2)        hostname = argv[1];
 
     if (hostname == NULL) hostname = TIME_SERVER;
 
     ticktock(hostname, &time_new);
+
+    if (gettimeofday(&tv, NULL) == -1) {
+        perror("Could not get system time");
+        exit(EXIT_FAILURE);
+    }
+    delta = tv.tv_sec - time_new;
+
     tv.tv_sec  = time_new;
     tv.tv_usec = 0;
 
@@ -76,6 +84,8 @@ int main(int argc, char **argv) {
         perror("Could not set system time");
         exit(EXIT_FAILURE);
     }
+    else
+        printf("%s: adjust time, server %s, offset %d sec\n", argv[0], hostname, delta);
 
     return 0;
 }
