@@ -11,6 +11,7 @@
 #define SERVICE "time"
 #define BASE_1970 2208988800UL
 
+/* Fetch time from server at 'hostname' and put it in 'time_new' */
 static int ticktock(const char *hostname, time_t *time_new) {
     int sockfd, nbytes, err;
     unsigned char buf[4];
@@ -67,8 +68,10 @@ int main(int argc, char **argv) {
 
     if (hostname == NULL) hostname = TIME_SERVER;
 
+    /* Get remote time */
     ticktock(hostname, &time_new);
 
+    /* Get system time */
     if (gettimeofday(&tv, NULL) == -1) {
         perror("Could not get system time");
         exit(EXIT_FAILURE);
@@ -78,6 +81,7 @@ int main(int argc, char **argv) {
     tv.tv_sec  = time_new;
     tv.tv_usec = 0;
 
+    /* Set system time to fetched remote time */
     if (settimeofday(&tv, NULL) == -1) {
         perror("Could not set system time");
         exit(EXIT_FAILURE);
