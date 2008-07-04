@@ -4,15 +4,13 @@
  * Uses the Time protocol (port 37), instead of NTP
  *
  * TODO:
- *   Add DNS resolution
  *   Add loop for checking and setting the clock
  */
 
-/* Socket stuff */
+/* Network stuff */
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
+#include <netdb.h>
 
 #include <sys/time.h>
 #include <stdlib.h>
@@ -21,30 +19,36 @@
 #include <unistd.h>
 #include <errno.h>
 
-#define NTP_SERVER "158.152.1.76"
-#define PORT 37
+#define TIME_SERVER "158.152.1.76"
+#define SERVICE "time"
 #define BASE_1970 2208988800UL
 
 int ticktock(const char *hostname, time_t *time_new) {
-    int sockfd, nbytes;
+    int sockfd, nbytes, err;
     unsigned char buf[4];
-    struct sockaddr_in dest_addr;
+    struct addrinfo hints, *res;
+
+    /* Hints about the type of socket */
+    memset(&hints, '\0', sizeof hints);
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+
+    /* Translate address and service information */
+    err = getaddrinfo(hostname, SERVICE, &hints, &res);
+    if (err || res == NULL) {
+		printf("Failed to lookup %s\n", hostname);
+		exit(1);
+	}
 
     /* Create socket */
-    sockfd = socket(PF_INET, SOCK_STREAM, 0);
+    sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
     if (sockfd == -1) {
         perror("socket");
         exit(1);
     }
 
-    /* Set socket's properties */
-    dest_addr.sin_family = AF_INET;
-    dest_addr.sin_port = htons(PORT);
-    dest_addr.sin_addr.s_addr = inet_addr(hostname);
-    memset(dest_addr.sin_zero, '\0', sizeof dest_addr.sin_zero);
-
     /* Initiate connection */
-    if (connect(sockfd, (struct sockaddr *)&dest_addr, sizeof dest_addr) == -1) {
+    if (connect(sockfd, res->ai_addr, res->ai_addrlen) == -1) {
         perror("connect");
         exit(1);
     }
@@ -67,7 +71,7 @@ int main(int argc, char **argv) {
 
     if (argc == 2)        hostname = argv[1];
 
-    if (hostname == NULL) hostname = NTP_SERVER;
+    if (hostname == NULL) hostname = TIME_SERVER;
 
     ticktock(hostname, &time_new);
     tv.tv_sec  = time_new;
