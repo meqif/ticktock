@@ -41,6 +41,7 @@ int ticktock(const char *hostname, time_t *time_new) {
     err = connect(sockfd, res->ai_addr, res->ai_addrlen);
     if (err == -1) {
         perror("connect");
+        freeaddrinfo(res);
         exit(1);
     }
 
@@ -51,6 +52,9 @@ int ticktock(const char *hostname, time_t *time_new) {
 
     /* Close socket */
     close(sockfd);
+
+    /* Free memory */
+    freeaddrinfo(res);
 
     return 0;
 }
