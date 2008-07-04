@@ -24,7 +24,6 @@
 #define NTP_SERVER "158.152.1.76"
 #define PORT 37
 #define BASE_1970 2208988800UL
-#define SECOND 1000000
 
 int ticktock(const char *hostname, time_t *time_new) {
     int sockfd, nbytes;
@@ -39,7 +38,7 @@ int ticktock(const char *hostname, time_t *time_new) {
 
     dest_addr.sin_family = AF_INET;
     dest_addr.sin_port = htons(PORT);
-    dest_addr.sin_addr.s_addr = inet_addr(NTP_SERVER);
+    dest_addr.sin_addr.s_addr = inet_addr(hostname);
     memset(dest_addr.sin_zero, '\0', sizeof dest_addr.sin_zero);
 
     if (connect(sockfd, (struct sockaddr *)&dest_addr, sizeof dest_addr) == -1) {
@@ -55,19 +54,21 @@ int ticktock(const char *hostname, time_t *time_new) {
     return 0;
 }
 
-int main() {
+int main(int argc, char **argv) {
     struct timeval tv;
     time_t time_new;
+    char *hostname = NULL;
 
-    ticktock(NTP_SERVER, &time_new);
-    printf("Received: %ld\n", time_new);
+    if (argc == 2)        hostname = argv[1];
+
+    if (hostname == NULL) hostname = NTP_SERVER;
+
+    ticktock(hostname, &time_new);
     tv.tv_sec  = time_new;
     tv.tv_usec = 0;
 
     if (settimeofday(&tv, NULL) == -1)
-        printf("Could not set system time: %s\n", strerror(errno));
-
-    //usleep(60 * SECOND);
+        perror("Could not set system time");
 
     return 0;
 }
