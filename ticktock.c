@@ -7,9 +7,9 @@
 
 #include "ticktock.h"
 
-#define TIME_SERVER "158.152.1.76"
-#define SERVICE "time"
-#define BASE_1970 2208988800UL
+#define TIME_SERVER    "158.152.1.76"
+#define SERVICE        "time"
+#define BASE_1970      2208988800UL
 
 /* Fetch time from server at 'hostname' and put it in 'time_new' */
 static int ticktock(const char *hostname, time_t *time_new) {
@@ -64,7 +64,18 @@ int main(int argc, char **argv) {
     char *hostname = NULL;
     int delta;
 
-    if (argc == 2)        hostname = argv[1];
+    if (argc == 2) {
+        if (!strcmp("-h", argv[1])) {
+            printf("Usage: %s <host>\n", argv[0]);
+            exit(EXIT_FAILURE);
+        }
+        else if (!strcmp("-v", argv[1])) {
+            printf("%s %s, © 2008 Ricardo Martins, see LICENSE for details\n", argv[0], VERSION);
+            exit(EXIT_FAILURE);
+        }
+        else
+            hostname = argv[1];
+    }
 
     if (hostname == NULL) hostname = TIME_SERVER;
 
