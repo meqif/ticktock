@@ -1,7 +1,7 @@
 /* See LICENSE file for copyright and license details.
  *
  * ticktock -- a small, secure and light time daemon
- * Uses the Time protocol (port 37), instead of NTP
+ * Uses the Time protocol (port 37), instead of NTP.
  *
  */
 
@@ -58,26 +58,50 @@ static int ticktock(const char *hostname, time_t *time_new) {
     return 0;
 }
 
+static void usage(char *argv0, int iserr) {
+	fprintf(stderr, "Usage: %s [-v] <host>\n", argv0);
+	exit(iserr ? EXIT_SUCCESS : EXIT_FAILURE);
+}
+
+static void version(char *argv0) {
+    printf("%s %s, © 2008 Ricardo Martins, see LICENSE for details\n",
+            argv0, VERSION);
+    exit(EXIT_SUCCESS);
+}
+
 int main(int argc, char **argv) {
     struct timeval tv;
     time_t time_new;
-    char *hostname = NULL;
-    int delta;
+    char *hostname, *argv0;
+    int delta, c;
 
-    if (argc == 2) {
-        if (!strcmp("-h", argv[1])) {
-            printf("Usage: %s <host>\n", argv[0]);
-            exit(EXIT_FAILURE);
-        }
-        else if (!strcmp("-v", argv[1])) {
-            printf("%s %s, © 2008 Ricardo Martins, see LICENSE for details\n", argv[0], VERSION);
-            exit(EXIT_FAILURE);
-        }
-        else
-            hostname = argv[1];
-    }
+    /* Store the name of the program */
+    argv0 = strrchr(argv[0], '/');
+	argv0 = (argv0) ? argv0+1 : argv[0];
 
-    if (hostname == NULL) hostname = TIME_SERVER;
+    /* Parse parameters */
+	while ((c = getopt(argc, argv, "vh?")) != -1) {
+
+		switch(c) {
+			case 'v': version(argv0);
+			case 'h':
+			case '?':
+				usage(argv0, 0);
+			break;
+			default:
+				fprintf(stderr, "Unknown option %c\n", c);
+				usage(argv0, 1);
+			break;
+		}
+
+	}
+
+	/* Remove the already parsed parameters */
+	argc -= optind;
+	argv += optind;
+
+	/* No hosts on command line? */
+    hostname = (argc<1) ? TIME_SERVER : argv[0];
 
     /* Get remote time */
     ticktock(hostname, &time_new);
@@ -98,7 +122,7 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
     else
-        printf("%s: adjust time, server %s, offset %d sec\n", argv[0], hostname, delta);
+        printf("%s: adjust time, server %s, offset %d sec\n", argv0, hostname, delta);
 
     return 0;
 }
