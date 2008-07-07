@@ -57,8 +57,8 @@ static int ticktock(const char *hostname, time_t *time_new) {
 }
 
 static void usage(char *argv0, int iserr) {
-	fprintf(stderr, "Usage: %s [-v] <host>\n", argv0);
-	exit(iserr ? EXIT_SUCCESS : EXIT_FAILURE);
+    fprintf(stderr, "Usage: %s [-v] <host>\n", argv0);
+    exit(iserr ? EXIT_SUCCESS : EXIT_FAILURE);
 }
 
 static void version(char *argv0) {
@@ -75,30 +75,30 @@ int main(int argc, char **argv) {
 
     /* Store the name of the program */
     argv0 = strrchr(argv[0], '/');
-	argv0 = (argv0) ? argv0+1 : argv[0];
+    argv0 = (argv0) ? argv0+1 : argv[0];
 
     /* Parse parameters */
-	while ((c = getopt(argc, argv, "vh?")) != -1) {
+    while ((c = getopt(argc, argv, "vh?")) != -1) {
 
-		switch(c) {
-			case 'v': version(argv0);
-			case 'h':
-			case '?':
-				usage(argv0, 0);
-			break;
-			default:
-				fprintf(stderr, "Unknown option %c\n", c);
-				usage(argv0, 1);
-			break;
-		}
+        switch(c) {
+            case 'v': version(argv0);
+            case 'h':
+            case '?':
+                usage(argv0, 0);
+            break;
+            default:
+                fprintf(stderr, "Unknown option %c\n", c);
+                usage(argv0, 1);
+            break;
+        }
 
-	}
+    }
 
-	/* Remove the already parsed parameters */
-	argc -= optind;
-	argv += optind;
+    /* Remove the already parsed parameters */
+    argc -= optind;
+    argv += optind;
 
-	/* No hosts on command line? */
+    /* No hosts on command line? */
     if (argc<1)     usage(argv0, 1);
 
     /* Set hostname */
