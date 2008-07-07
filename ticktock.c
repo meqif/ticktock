@@ -2,12 +2,10 @@
  *
  * ticktock -- a small, secure and light time daemon
  * Uses the Time protocol (port 37), instead of NTP.
- *
  */
 
 #include "ticktock.h"
 
-#define TIME_SERVER    "158.152.1.76"
 #define SERVICE        "time"
 #define BASE_1970      2208988800UL
 
@@ -101,7 +99,10 @@ int main(int argc, char **argv) {
 	argv += optind;
 
 	/* No hosts on command line? */
-    hostname = (argc<1) ? TIME_SERVER : argv[0];
+    if (argc<1)     usage(argv0, 1);
+
+    /* Set hostname */
+    hostname = argv[0];
 
     /* Get remote time */
     ticktock(hostname, &time_new);
