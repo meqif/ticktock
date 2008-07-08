@@ -23,7 +23,7 @@ static int ticktock(const char *hostname, time_t *time_new) {
     /* Translate address and service information */
     err = getaddrinfo(hostname, SERVICE, &hints, &res);
     if (err || res == NULL) {
-        printf("Failed to lookup %s\n", hostname);
+        fprintf(stderr, "Failed to lookup %s\n", hostname);
         exit(EXIT_FAILURE);
     }
 
@@ -79,7 +79,6 @@ int main(int argc, char **argv) {
 
     /* Parse parameters */
     while ((c = getopt(argc, argv, "vh?")) != -1) {
-
         switch(c) {
             case 'v': version(argv0);
             case 'h':
@@ -91,7 +90,6 @@ int main(int argc, char **argv) {
                 usage(argv0, 1);
             break;
         }
-
     }
 
     /* Remove the already parsed parameters */
