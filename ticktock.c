@@ -57,7 +57,7 @@ static int ticktock(const char *hostname, time_t *time_new) {
 }
 
 static void usage(char *argv0, int iserr) {
-    fprintf(stderr, "Usage: %s [-v] [-q] <host>\n", argv0);
+    fprintf(stderr, "Usage: %s [-n] [-q] [-v] <host>\n", argv0);
     exit(iserr ? EXIT_SUCCESS : EXIT_FAILURE);
 }
 
@@ -71,16 +71,17 @@ int main(int argc, char **argv) {
     struct timeval tv;
     time_t time_new;
     char *hostname, *argv0;
-    int delta, c, quiet = 0;
+    int delta, c, quiet = 0, dryrun = 0;
 
     /* Store the name of the program */
     argv0 = strrchr(argv[0], '/');
     argv0 = (argv0) ? argv0+1 : argv[0];
 
     /* Parse parameters */
-    while ((c = getopt(argc, argv, "qvh?")) != -1) {
+    while ((c = getopt(argc, argv, "qnvh?")) != -1) {
         switch(c) {
             case 'q': quiet = 1; break;
+            case 'n': dryrun = 1; break;
             case 'v': version(argv0);
             case 'h':
             case '?':
@@ -117,9 +118,11 @@ int main(int argc, char **argv) {
     tv.tv_usec = 0;
 
     /* Set system time to fetched remote time */
-    if (settimeofday(&tv, NULL) == -1) {
-        perror("Could not set system time");
-        exit(EXIT_FAILURE);
+    if (!dryrun) {
+        if (settimeofday(&tv, NULL) == -1) {
+            perror("Could not set system time");
+            exit(EXIT_FAILURE);
+        }
     }
 
     if (!quiet)
